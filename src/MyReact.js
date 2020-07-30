@@ -69,12 +69,16 @@ export class Component {
     setState(state) {
         let merge = (oldState,newState) => {
             for(let s in newState) {
-                if(typeof newState[s] === 'object') {
+                if(typeof newState[s] === 'object' && newState[s] !== null) {
                     if(typeof oldState[s] !== 'object') {
-                        newState[s] = {}
-                    } else {
-                        merge(oldState[s],newState[s])
+                        if(newState[s] instanceof Array) {
+                            oldState[s] = []
+                        } else {
+                            oldState[s] = {}
+                        }
                     }
+                    merge(oldState[s],newState[s])
+                    
                 } else {
                     oldState[s] = newState[s]
                 }
@@ -83,6 +87,7 @@ export class Component {
         if(!this.state && state) {
             this.state = {}
         }
+        
         merge(this.state,state)
         this.update()
     }
@@ -103,6 +108,7 @@ export let MyReact = {
                 if(typeof child === 'object' && child instanceof Array) {
                     insertChild(child)
                 } else {
+                    if(child === null) child = ''
                     if (!(child instanceof Component) && !(child instanceof wrapperElement) && !(child instanceof wrapperTextElement)) {
                         child = String(child)
                     }
